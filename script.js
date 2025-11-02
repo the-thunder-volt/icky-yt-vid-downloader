@@ -1,46 +1,35 @@
-document.getElementById("downloadBtn").addEventListener("click", async () => {
-  const urlInput = document.getElementById("urlInput");
-  const status = document.getElementById("status");
-  const videoUrl = urlInput.value.trim();
+const backendURL = "https://yt-download-backend-snl1.onrender.com/download";
 
-  if (!videoUrl) {
-    status.textContent = "⚠️ Please enter a video URL.";
+const input = document.getElementById("urlInput");
+const button = document.getElementById("downloadBtn");
+
+button.addEventListener("click", async () => {
+  const url = input.value.trim();
+  if (!url) {
+    alert("Enter a YouTube URL first!");
     return;
   }
 
-  status.textContent = "⏳ Downloading... Please wait.";
-
   try {
-    // ✅ Replace this with your actual Render backend URL
-    const backendURL = "https://yt-download-backend-snl1.onrender.com/download";
-
     const response = await fetch(backendURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: videoUrl })
+      body: JSON.stringify({ url }),
     });
 
     if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
+      throw new Error("Failed to reach backend: " + response.status);
     }
 
-    // Convert response to a downloadable blob
-    const blob = await response.blob();
-    const downloadUrl = URL.createObjectURL(blob);
+    const data = await response.json();
 
-    // Auto-download file
-    const a = document.createElement("a");
-    a.href = downloadUrl;
-    a.download = "video.mp4";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    // Cleanup
-    URL.revokeObjectURL(downloadUrl);
-    status.textContent = "✅ Download complete!";
+    if (data.error) {
+      alert("Error: " + data.error);
+    } else {
+      alert(`✅ Title: ${data.title}\n\nDirect URL: ${data.url}`);
+    }
   } catch (error) {
-    console.error("Error:", error);
-    status.textContent = "❌ Failed to download video. Try again.";
+    console.error(error);
+    alert("❌ Something went wrong. Check console for details.");
   }
 });
