@@ -14,7 +14,7 @@ button.addEventListener("click", async () => {
 
   try {
     // 🔹 Change this to your deployed backend URL when ready
-    const backendURL = "https://your-backend.onrender.com/download";
+    const backendURL = "https://yt-download-backend-snl1.onrender.com";
 
     const response = await fetch(backendURL, {
       method: "POST",
